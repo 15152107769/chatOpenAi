@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/nprogress/0.2.0/nprogress.min.css" />
+    <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.7.0-beta.5/vue.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.9/index.js"></script>
+    <script src="https://unpkg.com/axios@0.27.2/dist/axios.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/nprogress/0.2.0/nprogress.min.js"></script>
+    <style>
+        @import url(https://fonts.googleapis.com/css?family=Anonymous+Pro);
+
+        html {
+            min-height: 100%;
+        }
+
+        body {
+            background-color: rgb(25, 25, 25);
+            color: rgba(255, 255, 255, .75);
+            font-family: 'Anonymous Pro', monospace;
+            height: calc(100vh - 8em);
+            padding: 4em;
+        }
+
+        .content {
+            display: block;
+            font-family: 'Anonymous Pro', sans-serif;
+            margin: auto;
+            position: relative;
+            text-align: center;
+            top: 40%;
+            width: -webkit-calc(70%);
+        }
+
+
+        .typewrite {
+            font-size: 180%;
+            border-right: 2px solid rgba(255, 255, 255, .75);
+            line-height: 1.15;
+        }
+
+        .anim-typewrite {
+            animation: blinkTextCursor 500ms infinite normal;
+        }
+
+        @keyframes blinkTextCursor {
+            from {
+                border-right-color: rgba(255, 255, 255, .75);
+            }
+
+            to {
+                border-right-color: transparent;
+            }
+        }
+
+        /* style inspired by Thiago Teles Pereira @thiagoteles */
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div>
+            <el-input placeholder="请输入内容" v-model="message" clearable style="width: 200px;">
+            </el-input>
+            <el-button type="primary" @click="sumbit">提交</el-button>
+        </div>
+        <p class="content">
+            <span class="typewrite anim-typewrite js-typewrite"></span>
+        </p>
+    </div>
+    
+
+    <script>
+        new Vue({
+            el: '#app',
+            data() {
+                return {
+                    message: '',
+                }
+            },
+            methods: {
+                async sumbit() {
+                    var data = JSON.stringify({
+                        model: "text-davinci-003",
+                        prompt: this.message,
+                        temperature: 0,
+                        max_tokens: 2048,
+                    });
+                    var config = {
+                        method: "post",
+                        url: "https://api.openai.com/v1/completions",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: "Bearer YOUR_API_KEY",
+                        },
+                        data: data,
+                    };
+                    await axios(config).then(
+                        (response) => {
+
+                            var i = 0;
+                            var txt = response.data.choices[0].text;
+                            var arr = txt.replace(/\n/g, "<br/>")
+
+                            function typeWriter() {
+                                if (i < arr.length) {
+                                    document.getElementsByClassName('js-typewrite')[0].innerHTML +=
+                                        txt
+                                        .charAt(i)
+                                        .replace(/\n/g, "<br/>");
+                                    i++;
+                                    setTimeout(typeWriter, 0);
+                                }
+                            }
+                            setTimeout(typeWriter, 0);
+                        },
+                        (error) => {
+                            console.log("请求失败了", error.message);
+                        }
+                    );
+
+                },
+            }
+        })
+    </script>
+</body>
+
+</html>
