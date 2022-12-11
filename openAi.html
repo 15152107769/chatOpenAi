@@ -114,10 +114,10 @@
                                         .charAt(i)
                                         .replace(/\n/g, "<br/>");
                                     i++;
-                                    setTimeout(typeWriter, 0);
+                                    setTimeout(typeWriter, 65);
                                 }
                             }
-                            setTimeout(typeWriter, 0);
+                            setTimeout(typeWriter, 1000);
                         },
                         (error) => {
                             console.log("请求失败了", error.message);
